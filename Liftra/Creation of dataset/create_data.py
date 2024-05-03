@@ -64,16 +64,16 @@ def create_dataframe(folder_path, crane_number):
     for file in csv_files:
         # Read CSV file into a DataFrame
         df = pd.read_csv(os.path.join(folder_path, file))
-
-        # Specify which features to keep
-        df = df[['Values.WiFiSignalStrengthN']]
-
-        # Number of rows in the usecase
-        rows_in_usecase = len(df)
-
-        # Extract statistical features from binary and non-binary features
-        new_df = calculate_statistical_features(df, 'Values.WiFiSignalStrengthN')
         try:
+            # Specify which features to keep
+            df = df[['Values.WiFiSignalStrengthN']]
+
+            # Number of rows in the usecase
+            rows_in_usecase = len(df)
+
+            # Extract statistical features from binary and non-binary features
+            new_df = calculate_statistical_features(df, 'Values.WiFiSignalStrengthN')
+        
             # Add 'danger_zone' column
             new_df['danger_zone'] = 0
 
