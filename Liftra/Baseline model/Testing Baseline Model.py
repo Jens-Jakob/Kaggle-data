@@ -1,10 +1,11 @@
 import pandas as pd
-from sklearn.metrics import f1_score
-
+from sklearn.metrics import f1_score, ConfusionMatrixDisplay, confusion_matrix
+import os
+import matplotlib.pyplot as plt
 
 def apply_thresholds(data, threshold_row_index, threshold_median):
     # Apply both thresholds; predictions are danger if both conditions are true
-    predictions = ((data['RowIndex'] > threshold_row_index) & 
+    predictions = ((data['index_useinstance'] > threshold_row_index) & 
                    (data['Values.WiFiSignalStrengthN_median'] <= threshold_median)).astype(int)
     return predictions
 
@@ -15,15 +16,22 @@ def evaluate_model(data, threshold_row_index, threshold_median):
     # Calculate and return the F1 score
     f1 = f1_score(data['danger_zone'], predictions)
 
+    cm = confusion_matrix(data['danger_zone'], predictions)
+    display = ConfusionMatrixDisplay(confusion_matrix=cm)
+
+    display.plot()
+
+    plt.show()
     return f1
 
 def main():
-    # Load the test data
-    test_data = pd.read_csv(r"C:\Users\Victor Steinrud\Documents\DAKI\2. semester\P2\BaselineModelData\test_data.csv")
-    
+    # Load the training data
+    path = os.path.join(os.path.dirname(__file__), 'test_data.csv')
+    test_data = pd.read_csv(path)
+   
     # Define thresholds as determined from the training set
-    best_row_index_threshold = 4#insert threshold value
-    best_median_threshold =  4 #insert threshold value
+    best_row_index_threshold = 207.6734693877551 #insert threshold value
+    best_median_threshold = -65.3061224489796 #insert threshold value
     
     # Evaluate the model on the test set
     test_f1_score = evaluate_model(test_data, best_row_index_threshold, best_median_threshold)
