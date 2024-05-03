@@ -19,7 +19,11 @@ def evaluate_model(data, threshold_row_index, threshold_median):
     cm = confusion_matrix(data['danger_zone'], predictions)
     display = ConfusionMatrixDisplay(confusion_matrix=cm)
 
+<<<<<<< HEAD
     display.plot(cmap=plt.cm.Greens)
+=======
+    display.plot(cmap=plt.cm.Greens)
+>>>>>>> 87701bd714af6db1885b669158df72ad0a29a669
 
     plt.show()
     return f1
