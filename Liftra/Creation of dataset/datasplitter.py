@@ -47,36 +47,15 @@ def create_train_test_split(df, train_ratio=0.8, random_state=None):
     
     return train_df, test_df
 
-def save_concatenated_df(output_path, df, file_name):
-    """
-    Function that turns a DataFrame into a CSV-file and saves it in specified folder
-
-    Parameters:
-    - output_path: Path to location where you want to save the CSV-file
-    - df: The DataFrame that'll get saved as a CSV-file
-    - file_name: Filename of the CSV-file when it gets saved.
-    """
-    
-    # Check if the output directory exists, create it if not
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-
-    # Write the concatenated DataFrame to a CSV file
-    output_file = os.path.join(output_path, file_name)
-    df.to_csv(output_file, index=False)
-
-    print("Concatenated CSV saved to:", output_file)
 
 def main():
     path = r'C:\Users\marti\Desktop\Uni\Design og Anvendelse af AI\2. semester\P2\Dataframes\Baseline model\concatenated cranes\concatenated_cranes.csv'
     df = pd.read_csv(path)
     train_df, test_df = create_train_test_split(df, random_state=42)
-
-    output_path = os.path.dirname(path)  # Get the directory of the original CSV file
     
     # Save train_df and test_df as CSV files in the same directory
-    save_concatenated_df(output_path, train_df, 'train_data.csv')
-    save_concatenated_df(output_path, test_df, 'test_data.csv')
+    train_df.to_csv('train_data.csv', index=False)
+    test_df.to_csv('test_data.csv', index=False)
 
 
 if __name__ == '__main__':
