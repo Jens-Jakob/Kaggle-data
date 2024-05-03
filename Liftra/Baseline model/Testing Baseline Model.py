@@ -22,8 +22,8 @@ def main():
     test_data = pd.read_csv(r"C:\Users\Victor Steinrud\Documents\DAKI\2. semester\P2\BaselineModelData\test_data.csv")
     
     # Define thresholds as determined from the training set
-    best_row_index_threshold = #insert threshold value
-    best_median_threshold = #insert threshold value
+    best_row_index_threshold = 4#insert threshold value
+    best_median_threshold =  4 #insert threshold value
     
     # Evaluate the model on the test set
     test_f1_score = evaluate_model(test_data, best_row_index_threshold, best_median_threshold)
