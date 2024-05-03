@@ -55,7 +55,7 @@ def split_data(df, test_size=0.5):
 
 def main():
     # load df
-    path = os.path.join(os.path.dirname(__file__), 'sensor.csv')
+    path = r"C:\Users\marti\Desktop\Uni\Design og Anvendelse af AI\2. semester\P2\sensor.csv"
     df = pd.read_csv(path)
 
     # Replace MV's with 0
