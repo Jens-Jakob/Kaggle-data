@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics import f1_score
+import os
 
 def evaluate_threshold(data, feature, threshold):
     # Check if the feature is 'RowIndex', and set the classification rule accordingly
@@ -33,20 +34,22 @@ def grid_search(data, feature, thresholds):
 
 def main():
     # Load the training data
-    train_data = pd.read_csv(r"C:\Users\Victor Steinrud\Documents\DAKI\2. semester\P2\BaselineModelData\train_data.csv")
+    path = os.path.join(os.path.dirname(__file__), 'train_data.csv')
+    train_data = pd.read_csv(path)
     
     # Define the range of thresholds to test
     mean_thresholds = np.linspace(-100, 0, num=50)
     median_thresholds = np.linspace(-100, 0, num=50)
-    row_index_thresholds = np.linspace(train_data['RowIndex'].min(), train_data['RowIndex'].max(), num=50)
+    row_index_thresholds = np.linspace(train_data['index_useinstance'].min(), train_data['index_useinstance'].max(), num=50)
 
     # Run grid search for median
     best_median_threshold, best_median_f1 = grid_search(train_data, 'Values.WiFiSignalStrengthN_median', median_thresholds)
-    print(f"Best Threshold for median: {best_median_threshold} with F1 Score: {best_median_f1}")
+    
 
     # Run grid search for RowIndex
-    best_row_index_threshold, best_row_index_f1 = grid_search(train_data, 'RowIndex', row_index_thresholds)
+    best_row_index_threshold, best_row_index_f1 = grid_search(train_data, 'index_useinstance', row_index_thresholds)
+    
     print(f"Best Threshold for RowIndex: {best_row_index_threshold} with F1 Score: {best_row_index_f1}")
-
+    print(f"Best Threshold for median: {best_median_threshold} with F1 Score: {best_median_f1}")
 if __name__ == "__main__":
     main()
