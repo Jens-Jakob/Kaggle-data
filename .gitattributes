@@ -1,0 +1,2 @@
+*.csv filter=lfs diff=lfs merge=lfs -text
+Pump[[:space:]]sensor[[:space:]]data/Creation[[:space:]]of[[:space:]]dataset/sensor.csv filter=lfs diff=lfs merge=lfs -text
