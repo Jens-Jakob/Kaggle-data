@@ -1,6 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import warnings
+warnings.filterwarnings('ignore')
 
 def visualise_single_feature(feature, df):
     """
@@ -26,23 +29,6 @@ def visualise_single_feature(feature, df):
     plt.show()
 
 def calculate_statistical_features(df_usecase, features):
-    """
-    Description:
-    ---------------------------
-    A function that extracts statistical features from a DataFrame
-    ---------------------------
-
-    Parameters:
-    ---------------------------
-    - df_usecase: Dataframe containing original features for each use instance
-    - non_binary_features: List of non-binary features
-    - binary_features: List of binary features
-
-    Returns:
-    ---------------------------
-    - df_features: DataFrame containing the extracted statistical features for each use instance
-    ---------------------------
-    """
     # Initialize an empty list to store statistical features for each use case
     use_case_features = []
 
@@ -79,9 +65,69 @@ def calculate_statistical_features(df_usecase, features):
 
     return df_features
 
+def feature_engineering(interval_df):
+    features_for_extraction = []
+    for feature in interval_df.columns:
+        features_for_extraction.append(feature)
+    
+    # Extract statistical features for the interval
+    statistical_features = calculate_statistical_features(interval_df, features=features_for_extraction)
+
+
+    # Determine the majority value for 'date' and 'danger_zone' within the segment
+    majority_y = interval_df['y'].mode()[0] if 'y' in interval_df.columns else None
+    
+    # Replace NaN values with the majority value
+    if majority_y is not None:
+        interval_df['y'].fillna(majority_y, inplace=True)
+
+    # Append the statistical features along with majority date and majority danger_zone
+    statistical_features['y'] = majority_y
+    return statistical_features
+
+
+def create_segmented_dataframe(df, df_name, segment_size=7, stride=1):
+    # Initialize an empty list to store DataFrames
+    dfs = []
+    try:
+        """Use for-loop below to do striding, i.e. rolling segmentation"""
+        # Roll the intervals with overlapping segments
+        for i in range(0, len(df) - segment_size + 1, stride):
+            start_idx = i
+            end_idx = min(i + segment_size, len(df))  # Adjust end index to handle the last segment
+            interval_df = df.iloc[start_idx:end_idx]
+            # visualise_single_feature('Values.WiFiSignalStrengthN_median',interval_df)
+
+            statistical_features = feature_engineering(interval_df)
+
+            dfs.append(statistical_features)
+            print(f"Calculated statistical features for {df_name}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+    if dfs:
+        # Concatenate the list of DataFrames
+        segmented_df = pd.concat(dfs, ignore_index=True)
+        return segmented_df
+    else:
+        # Skip segmentation and return None
+        print("No segmentation performed as dfs is empty.")
+        return None
+    
+def save_concatenated_df(output_path, df, file_name):  
+    # Check if the output directory exists, create it if not
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    # Write the concatenated DataFrame to a CSV file
+    output_file = os.path.join(output_path, file_name)
+    df.to_csv(output_file, index=False)
+
+    print("Concatenated CSV saved to:", output_file)
+
 def main():
     # load data
-    path = r'C:\Users\marti\Desktop\Uni\Design og Anvendelse af AI\2. semester\P2\Kaggle data\data.csv'
+    path = r'C:\Users\marti\Desktop\Uni\Design og Anvendelse af AI\2. semester\P2\Kaggle data\Controlled anomalies\data.csv'
     df = pd.read_csv(path)
     # Drop irrelevant features
     df.drop(['aimp','adbr','adfl','category'], axis=1, inplace=True)
@@ -90,9 +136,9 @@ def main():
     df.drop(['timestamp'], axis=1, inplace=True) 
 
     # Slice dataset for easier computation
-    train_df = df[1000000:1300000] # Train
+    train_df = df[1000000:1080000] # Train
     train_df = train_df.reset_index()
-    test_df = df[4300000:4350000] # Test
+    test_df = df[4310000:4326000] # Test
     test_df = test_df.reset_index()
 
     # Map target column
@@ -101,6 +147,17 @@ def main():
 
     # Visualize feature
     # visualise_single_feature('arnd', train_df)
+    # visualise_single_feature('arnd', test_df)
+    
+    # Save df
+    output_path = r'C:\Users\marti\Desktop\Uni\Design og Anvendelse af AI\2. semester\P2\Kaggle data\Controlled anomalies'
+    train_df = create_segmented_dataframe(train_df, 'train_df')
+    save_concatenated_df(output_path, train_df, 'train_df.csv')
+
+    test_df = create_segmented_dataframe(test_df, 'test_df')
+    save_concatenated_df(output_path, test_df, 'test_df.csv')
+    
+
 
 
 
