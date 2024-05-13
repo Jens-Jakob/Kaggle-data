@@ -8,19 +8,21 @@ from sklearn.metrics import classification_report, confusion_matrix
 def preprocess(path):
     df = pd.read_csv(path)
 
-    # Drop index column
-    for feature in df.columns:
-        if "index" in feature:
-            df.drop([feature], axis=1, inplace=True)
-    
     # Define input/target
     X = df.drop(['y'], axis=1)
     y = df['y']
     return X, y
 
 classifiers = {
-    'XGB': XGBClassifier(),
-    'RF': RandomForestClassifier()
+    'XGB': XGBClassifier(learning_rate=0.2, max_depth=10, 
+                        min_child_weight=1, min_split_loss=5,
+                        n_estimators=15, scale_pos_weight=30,
+                        subsample=0.5, random_state=42),
+    'RF': RandomForestClassifier(class_weight='balanced_subsample', 
+                                criterion='entropy', max_depth=5, 
+                                min_samples_leaf=4, min_samples_split=10, 
+                                min_weight_fraction_leaf=0.3, n_estimators=50,
+                                random_state=42)
 }
 
 def evaluate_model(X_train, y_train, X_test, y_test, name, ml_model):
