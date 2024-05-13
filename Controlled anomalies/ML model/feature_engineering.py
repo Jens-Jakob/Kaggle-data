@@ -65,14 +65,14 @@ def calculate_statistical_features(df_usecase, features):
 
     return df_features
 
-def feature_engineering(interval_df):
+def feature_engineering(interval_df, exclude_features=['y']):
     features_for_extraction = []
     for feature in interval_df.columns:
-        features_for_extraction.append(feature)
+        if feature not in exclude_features:
+            features_for_extraction.append(feature)
     
     # Extract statistical features for the interval
     statistical_features = calculate_statistical_features(interval_df, features=features_for_extraction)
-
 
     # Determine the majority value for 'date' and 'danger_zone' within the segment
     majority_y = interval_df['y'].mode()[0] if 'y' in interval_df.columns else None
@@ -144,6 +144,8 @@ def main():
     # Map target column
     print(train_df['y'].value_counts())
     print(test_df['y'].value_counts())
+    train_df.drop(['index'], axis=1, inplace=True)
+    test_df.drop(['index'], axis=1, inplace=True)
 
     # Visualize feature
     # visualise_single_feature('arnd', train_df)
