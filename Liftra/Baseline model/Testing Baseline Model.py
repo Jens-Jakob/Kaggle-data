@@ -2,6 +2,8 @@ import pandas as pd
 from sklearn.metrics import f1_score, ConfusionMatrixDisplay, confusion_matrix
 import os
 import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
 def apply_thresholds(data, threshold_row_index, threshold_median):
     # Apply both thresholds; predictions are danger if both conditions are true
@@ -17,14 +19,21 @@ def evaluate_model(data, threshold_row_index, threshold_median):
     f1 = f1_score(data['danger_zone'], predictions)
 
     cm = confusion_matrix(data['danger_zone'], predictions)
-    display = ConfusionMatrixDisplay(confusion_matrix=cm)
+    # Calculate percentages
+    total = cm.sum()
+    cm_percentages = cm / total * 100
+    cm_percentages = np.round(cm_percentages, 2)
 
-<<<<<<< HEAD
-    display.plot(cmap=plt.cm.Greens)
-=======
-    display.plot(cmap=plt.cm.Greens)
->>>>>>> 87701bd714af6db1885b669158df72ad0a29a669
+    # Display the confusion matrix as percentages of total with % symbol
+    plt.figure(figsize=(7, 7))
+    ax = sns.heatmap(cm_percentages, annot=True, fmt='.2f', cmap='Greens', cbar=False, 
+                     annot_kws={"size": 12}, linewidths=.5, linecolor='black')
+    for t in ax.texts: 
+        t.set_text(t.get_text() + " %")
 
+    plt.title(f'Baseline model (Liftra) - Confusion Matrix (Percentages)')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
     plt.show()
     return f1
 

@@ -2,6 +2,8 @@ import pandas as pd
 from sklearn.metrics import f1_score, ConfusionMatrixDisplay, confusion_matrix
 import os
 import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
 def apply_thresholds(data, thresholds):
     predictions = None  # Initialize predictions
@@ -28,11 +30,23 @@ def evaluate_model(data, thresholds):
     f1 = f1_score(data['machine_status'], predictions)
 
     cm = confusion_matrix(data['machine_status'], predictions)
-    display = ConfusionMatrixDisplay(confusion_matrix=cm)
+    # Calculate percentages
+    total = cm.sum()
+    cm_percentages = cm / total * 100
+    cm_percentages = np.round(cm_percentages, 2)
 
-    display.plot(cmap=plt.cm.Greens)
+    # Display the confusion matrix as percentages of total with % symbol
+    plt.figure(figsize=(7, 7))
+    ax = sns.heatmap(cm_percentages, annot=True, fmt='.2f', cmap='Greens', cbar=False, 
+                     annot_kws={"size": 12}, linewidths=.5, linecolor='black')
+    for t in ax.texts: 
+        t.set_text(t.get_text() + " %")
 
+    plt.title(f'Baseline model (Pump sensor) - Confusion Matrix (Percentages)')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
     plt.show()
+
     return f1
 
 def main():
